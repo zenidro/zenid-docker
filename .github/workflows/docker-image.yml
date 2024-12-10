@@ -18,5 +18,8 @@ jobs:
 
       - name: Build the Docker image
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }} # Aici injectăm token-ul ca variabilă de mediu
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: docker buildx build --file Dockerfile --tag zenidro-image:$(date +%s) .
+
+      - name: Verify GH_TOKEN
+        run: echo $GH_TOKEN
