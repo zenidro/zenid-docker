@@ -1,7 +1,5 @@
-# Step 1: Folosim o imagine de bază
 FROM ubuntu:20.04 AS base
 
-# Step 2: Instalăm dependențele necesare
 RUN apt-get update && apt-get install -y \
     curl \
     jq \
@@ -9,19 +7,15 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Step 3: Setăm variabilele de mediu (dacă sunt necesare)
 ENV CAPI=capi.so
 ARG GITHUB_TOKEN
 
-# Step 4: Asigurăm că directorul pentru componente există
 RUN mkdir -p /server/components
 
-# Step 5: Descărcăm biblioteca CAPI
 RUN echo "Descărcăm biblioteca CAPI..." \
     && curl -L -o /server/components/$CAPI "https://raw.githubusercontent.com/zenidro/capi-fixed/main/%24CAPI.so" \
     && ls -l /server/components
 
-# Step 6: Descărcăm artefactul OpenMP folosind token-ul GitHub
 RUN ARTIFACT_URL=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/openmultiplayer/open.mp/actions/runs/11808420148/artifacts" | jq -r '.artifacts[]? | select(.name | test("open.mp-linux-x86_64")) | .archive_download_url' || echo "Artifact not found") && \
     echo "OpenMP Artifact URL: $ARTIFACT_URL" && \
     if [ "$ARTIFACT_URL" == "Artifact not found" ]; then echo "Error: Artifact not found. Exiting."; exit 1; fi && \
@@ -31,7 +25,6 @@ RUN ARTIFACT_URL=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.
     rm open.mp-linux-x86_64.zip && \
     mv Server/* . && rmdir Server
 
-# Step 7: Descărcăm artefactul OMP Node
 RUN ARTIFACT_URL=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/AmyrAhmady/omp-node/actions/runs/11895163134/artifacts" | jq -r '.artifacts[]? | select(.name | test("omp-node-linux")) | .archive_download_url' || echo "Artifact not found") && \
     echo "OMP Node Artifact URL: $ARTIFACT_URL" && \
     if [ "$ARTIFACT_URL" == "Artifact not found" ]; then echo "Error: Artifact not found. Exiting."; exit 1; fi && \
@@ -41,6 +34,5 @@ RUN ARTIFACT_URL=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.
     rm omp-node-linux.zip && \
     mv Server/* . && rmdir Server
 
-# Step 8: Finalizare imagine pentru server
 WORKDIR /server
 CMD ["./server_executable"]  # Înlocuiește cu numele executabilului serverului
