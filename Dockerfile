@@ -1,10 +1,11 @@
 FROM ubuntu:20.04 AS base
 
-RUN mkdir -p /server
-RUN mkdir -p /server/components
+# Crearea directorului de componente
+RUN mkdir -p /components
 
 WORKDIR /server
 
+# Instalarea pachetelor necesare
 RUN apt-get update && apt-get install -y \
     curl \
     jq \
@@ -12,36 +13,46 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+# Definirea variabilei pentru biblioteca CAPI
 ENV CAPI=capi.so
 
+# Descărcarea bibliotecii CAPI
 RUN echo "Descărcăm biblioteca CAPI..." \
-    && curl -L -o /server/components/$CAPI "https://raw.githubusercontent.com/zenidro/capi-fixed/main/%24CAPI.so" \
-    && ls -l /server/components
+    && curl -L -o /components/$CAPI "https://raw.githubusercontent.com/zenidro/capi-fixed/main/%24CAPI.so" \
+    && ls -l /components
 
-RUN ARTIFACT_URL=$(curl -s -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/repos/openmultiplayer/open.mp/actions/runs/11808420148/artifacts" | jq -r '.artifacts[]? | select(.name | test("open.mp-linux-x86_64")) | .archive_download_url') && \
-    echo "OpenMP Artifact URL: $ARTIFACT_URL" && \
-    curl -L -o open.mp-linux-x86_64.zip $ARTIFACT_URL && \
-    ls -lh open.mp-linux-x86_64.zip && \
-    unzip open.mp-linux-x86_64.zip && \
-    rm open.mp-linux-x86_64.zip && \
+# Setarea variabilelor pentru OpenMP Artifact
+ENV OPENMP_FILE_NAME=open.mp-linux-x86_64-v1.3.1.2744-25-g4cb25eab.zip
+ENV OPENMP_ARTIFACT_URL="https://api.github.com/repos/openmultiplayer/open.mp/actions/artifacts/2179619213/zip"
+
+# Descărcarea OpenMP Artifact
+RUN echo "Descarc OpenMP Artifact..." && \
+    curl -L -o $OPENMP_FILE_NAME -H "Authorization: Bearer $GH_TOKEN" $OPENMP_ARTIFACT_URL && \
+    ls -lh $OPENMP_FILE_NAME && \
+    unzip $OPENMP_FILE_NAME && \
+    rm $OPENMP_FILE_NAME && \
     mv Server/* . && rmdir Server
 
-RUN ARTIFACT_URL=$(curl -s -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/repos/AmyrAhmady/omp-node/actions/runs/11895163134/artifacts" | jq -r '.artifacts[]? | select(.name | test("omp-node-linux")) | .archive_download_url') && \
-    echo "OMP Node Artifact URL: $ARTIFACT_URL" && \
-    curl -L -o omp-node-linux.zip $ARTIFACT_URL && \
-    ls -lh omp-node-linux.zip && \
-    unzip omp-node-linux.zip && \
-    rm omp-node-linux.zip && \
+# Setarea variabilelor pentru OMP Node Artifact
+ENV OMP_NODE_FILE_NAME=omp-node-linux.zip
+ENV OMP_NODE_ARTIFACT_URL="https://api.github.com/repos/AmyrAhmady/omp-node/actions/artifacts/11895163134/zip"
+
+# Descărcarea OMP Node Artifact
+RUN echo "Descarc OMP Node Artifact..." && \
+    curl -L -o $OMP_NODE_FILE_NAME -H "Authorization: Bearer $GH_TOKEN" $OMP_NODE_ARTIFACT_URL && \
+    ls -lh $OMP_NODE_FILE_NAME && \
+    unzip $OMP_NODE_FILE_NAME && \
+    rm $OMP_NODE_FILE_NAME && \
     mv Server/* . && rmdir Server
 
-# Dacă dorești să copiezi fișierele direct în /server fără să folosești un subdirector server/
-COPY . /server/
-
+# Copierea și setarea permisiunilor pentru entrypoint.sh
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x omp-server
 
+# Expunerea portului pentru server
 EXPOSE 7777/udp
 
+# Setarea permisiunilor pentru scriptul de entrypoint
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
