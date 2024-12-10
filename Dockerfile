@@ -18,7 +18,7 @@ RUN ARTIFACT_URL=$(curl -s "https://api.github.com/repos/AmyrAhmady/omp-node/act
 
 # Download CAPI library
 FROM base AS download_library
-RUN curl -L -o /server/components/$CAPI.so "https://raw.githubusercontent.com/zenidro/capi-fixed/main/$CAPI.so"
+RUN curl -L -o /server/components/$CAPI.so "https://github.com/zenidro/capi-fixed/blob/main/%24CAPI.so"
 
 # Final image to serve
 FROM base AS final
