@@ -17,9 +17,9 @@ RUN apt-get update && apt-get install -y \
 ENV CAPI=capi.so
 
 # Descărcarea bibliotecii CAPI
-RUN echo "Descărcăm biblioteca CAPI..." \
-    && curl -L -o /components/$CAPI "https://raw.githubusercontent.com/zenidro/capi-fixed/main/%24CAPI.so" \
-    && ls -l /components
+RUN echo "Descărcăm biblioteca CAPI..." && \
+    curl -L -o /components/$CAPI "https://raw.githubusercontent.com/zenidro/capi-fixed/main/%24CAPI.so" && \
+    ls -l /components
 
 # Setarea variabilelor pentru OpenMP Artifact
 ENV OPENMP_FILE_NAME=open.mp-linux-x86_64-v1.3.1.2744-25-g4cb25eab
@@ -27,10 +27,9 @@ ENV OPENMP_ARTIFACT_URL="https://api.github.com/repos/openmultiplayer/open.mp/ac
 
 # Descărcarea OpenMP Artifact
 RUN echo "Descarc OpenMP Artifact..." && \
-    curl -L -o $OPENMP_FILE_NAME.tar.gz -H "Authorization: Bearer $GH_TOKEN" $OPENMP_ARTIFACT_URL && \
-    # Folosim tar pentru a extrage arhiva tar.gz
-    tar -xzf $OPENMP_FILE_NAME.tar.gz && \
-    rm $OPENMP_FILE_NAME.tar.gz && \
+    curl -L -o $OPENMP_FILE_NAME.tar -H "Authorization: Bearer $GH_TOKEN" $OPENMP_ARTIFACT_URL && \
+    tar -xf $OPENMP_FILE_NAME.tar && \
+    rm $OPENMP_FILE_NAME.tar && \
     mv Server/* . && rmdir Server
 
 # Setarea variabilelor pentru OMP Node Artifact
@@ -39,10 +38,9 @@ ENV OMP_NODE_ARTIFACT_URL="https://api.github.com/repos/AmyrAhmady/omp-node/acti
 
 # Descărcarea OMP Node Artifact
 RUN echo "Descarc OMP Node Artifact..." && \
-    curl -L -o $OMP_NODE_FILE_NAME.tar.gz -H "Authorization: Bearer $GH_TOKEN" $OMP_NODE_ARTIFACT_URL && \
-    # Folosim tar pentru a extrage arhiva tar.gz
-    tar -xzf $OMP_NODE_FILE_NAME.tar.gz && \
-    rm $OMP_NODE_FILE_NAME.tar.gz && \
+    curl -L -o $OMP_NODE_FILE_NAME.tar -H "Authorization: Bearer $GH_TOKEN" $OMP_NODE_ARTIFACT_URL && \
+    tar -xzf $OMP_NODE_FILE_NAME.tar && \
+    rm $OMP_NODE_FILE_NAME.tar && \
     mv Server/* . && rmdir Server
 
 # Copierea și setarea permisiunilor pentru entrypoint.sh
