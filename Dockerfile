@@ -18,7 +18,7 @@ RUN ARTIFACT_URL=$(curl -s "https://api.github.com/repos/openmultiplayer/open.mp
 
 # Download OMP Node artifact
 FROM base AS download_ompnode
-ARG WORKFLOW_NODE_ID=1234567890
+ARG WORKFLOW_NODE_ID=11895163134
 ARG ARTIFACT_NODE_NAME=omp-node-linux
 RUN ARTIFACT_URL=$(curl -s "https://api.github.com/repos/AmyrAhmady/omp-node/actions/runs/$WORKFLOW_NODE_ID/artifacts" \
 | jq -r '.artifacts[]? | select(.name | test("omp-node-linux")) | .archive_download_url' || echo "Artifact not found") && \
