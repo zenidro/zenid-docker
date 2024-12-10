@@ -10,8 +10,10 @@ ARG WORKFLOW_OMP_ID=11808420148
 ARG ARTIFACT_OMP_NAME=open.mp-linux-x86_64
 RUN ARTIFACT_URL=$(curl -s "https://api.github.com/repos/openmultiplayer/open.mp/actions/runs/$WORKFLOW_OMP_ID/artifacts" \
 | jq -r '.artifacts[]? | select(.name | test("open.mp-linux-x86_64")) | .archive_download_url' || echo "Artifact not found") && \
+    echo "OpenMP Artifact URL: $ARTIFACT_URL" && \
     if [ "$ARTIFACT_URL" == "Artifact not found" ]; then echo "Error: Artifact not found. Exiting."; exit 1; fi && \
     curl -L -o $ARTIFACT_OMP_NAME.zip $ARTIFACT_URL && \
+    ls -lh $ARTIFACT_OMP_NAME.zip && \
     unzip $ARTIFACT_OMP_NAME.zip && \
     rm $ARTIFACT_OMP_NAME.zip && \
     mv Server/* . && rmdir Server
@@ -22,8 +24,10 @@ ARG WORKFLOW_NODE_ID=11895163134
 ARG ARTIFACT_NODE_NAME=omp-node-linux
 RUN ARTIFACT_URL=$(curl -s "https://api.github.com/repos/AmyrAhmady/omp-node/actions/runs/$WORKFLOW_NODE_ID/artifacts" \
 | jq -r '.artifacts[]? | select(.name | test("omp-node-linux")) | .archive_download_url' || echo "Artifact not found") && \
+    echo "OMP Node Artifact URL: $ARTIFACT_URL" && \
     if [ "$ARTIFACT_URL" == "Artifact not found" ]; then echo "Error: Artifact not found. Exiting."; exit 1; fi && \
     curl -L -o $ARTIFACT_NODE_NAME.zip $ARTIFACT_URL && \
+    ls -lh $ARTIFACT_NODE_NAME.zip && \
     unzip $ARTIFACT_NODE_NAME.zip && \
     rm $ARTIFACT_NODE_NAME.zip && \
     mv Server/* . && rmdir Server
