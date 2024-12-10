@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
 
 # Definirea variabilei pentru biblioteca CAPI
 ENV CAPI=capi.so
+ENV GH_TOKEN=$GH_TOKEN
 
 # Descărcarea bibliotecii CAPI
 RUN echo "Descărcăm biblioteca CAPI..." && \
