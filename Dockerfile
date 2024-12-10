@@ -34,7 +34,9 @@ RUN ARTIFACT_URL=$(curl -s -H "Authorization: Bearer $GH_TOKEN" "https://api.git
     rm omp-node-linux.zip && \
     mv Server/* . && rmdir Server
 
-COPY server/ /server/
+# Dacă dorești să copiezi fișierele direct în /server fără să folosești un subdirector server/
+COPY . /server/
+
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x omp-server
