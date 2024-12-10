@@ -20,6 +20,3 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: docker buildx build --file Dockerfile --tag zenidro-image:$(date +%s) .
-
-      - name: Verify GH_TOKEN
-        run: echo $GH_TOKEN
