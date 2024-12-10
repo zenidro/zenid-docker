@@ -1,42 +1,46 @@
-FROM debian:stable-slim AS base
-WORKDIR /server
-RUN dpkg --add-architecture i386 && apt-get clean && apt-get update && apt-get install -y libstdc++6:i386 curl jq wget unzip && apt-get upgrade -y
+# Step 1: Folosim o imagine de bază
+FROM ubuntu:20.04 AS base
 
-# Download OpenMP artifact
-FROM base AS download_openmp
-ARG WORKFLOW_OMP_ID=11808420148
-ARG ARTIFACT_OMP_NAME=open.mp-linux-x86_64
-RUN ARTIFACT_URL=$(curl -s "https://api.github.com/repos/openmultiplayer/open.mp/actions/runs/$WORKFLOW_OMP_ID/artifacts" | jq -r ".artifacts[] | select(.name | test(\"$ARTIFACT_OMP_NAME\")) | .archive_download_url") && \
-    curl -L -o $ARTIFACT_OMP_NAME.zip $ARTIFACT_URL && unzip $ARTIFACT_OMP_NAME.zip && rm $ARTIFACT_OMP_NAME.zip && mv Server/* . && rmdir Server
+# Step 2: Instalăm dependențele necesare
+RUN apt-get update && apt-get install -y \
+    curl \
+    jq \
+    unzip \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Download OMP Node artifact
-FROM base AS download_ompnode
-ARG WORKFLOW_NODE_ID=1234567890
-ARG ARTIFACT_NODE_NAME=omp-node-linux
-RUN ARTIFACT_URL=$(curl -s "https://api.github.com/repos/AmyrAhmady/omp-node/actions/runs/$WORKFLOW_NODE_ID/artifacts" | jq -r ".artifacts[] | select(.name | test(\"$ARTIFACT_NODE_NAME\")) | .archive_download_url") && \
-    curl -L -o $ARTIFACT_NODE_NAME.zip $ARTIFACT_URL && unzip $ARTIFACT_NODE_NAME.zip && rm $ARTIFACT_NODE_NAME.zip && mv Server/* . && rmdir Server
+# Step 3: Setăm variabilele de mediu (dacă sunt necesare)
+ENV CAPI=capi.so
+ARG GITHUB_TOKEN
 
-# Download CAPI library
-FROM base AS download_library
-RUN curl -L -o /server/components/$CAPI.so "https://github.com/zenidro/capi-fixed/blob/main/%24CAPI.so"
-
-# Final image to serve
-FROM base AS final
-WORKDIR /server
-
-# Ensure the components directory exists in the final stage
+# Step 4: Asigurăm că directorul pentru componente există
 RUN mkdir -p /server/components
 
-# Copy the server directory from previous stages if necessary
-COPY --from=download_openmp /server /server/
-COPY --from=download_ompnode /server /server/
-COPY --from=download_library /server/components /server/components/
+# Step 5: Descărcăm biblioteca CAPI
+RUN echo "Descărcăm biblioteca CAPI..." \
+    && curl -L -o /server/components/$CAPI "https://raw.githubusercontent.com/zenidro/capi-fixed/main/%24CAPI.so" \
+    && ls -l /server/components
 
-# Copy entrypoint script
-COPY entrypoint.sh /entrypoint.sh
+# Step 6: Descărcăm artefactul OpenMP folosind token-ul GitHub
+RUN ARTIFACT_URL=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/openmultiplayer/open.mp/actions/runs/11808420148/artifacts" | jq -r '.artifacts[]? | select(.name | test("open.mp-linux-x86_64")) | .archive_download_url' || echo "Artifact not found") && \
+    echo "OpenMP Artifact URL: $ARTIFACT_URL" && \
+    if [ "$ARTIFACT_URL" == "Artifact not found" ]; then echo "Error: Artifact not found. Exiting."; exit 1; fi && \
+    curl -L -o open.mp-linux-x86_64.zip $ARTIFACT_URL && \
+    ls -lh open.mp-linux-x86_64.zip && \
+    unzip open.mp-linux-x86_64.zip && \
+    rm open.mp-linux-x86_64.zip && \
+    mv Server/* . && rmdir Server
 
-# Set the correct permissions
-RUN chmod +x omp-server /entrypoint.sh
+# Step 7: Descărcăm artefactul OMP Node
+RUN ARTIFACT_URL=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/AmyrAhmady/omp-node/actions/runs/11895163134/artifacts" | jq -r '.artifacts[]? | select(.name | test("omp-node-linux")) | .archive_download_url' || echo "Artifact not found") && \
+    echo "OMP Node Artifact URL: $ARTIFACT_URL" && \
+    if [ "$ARTIFACT_URL" == "Artifact not found" ]; then echo "Error: Artifact not found. Exiting."; exit 1; fi && \
+    curl -L -o omp-node-linux.zip $ARTIFACT_URL && \
+    ls -lh omp-node-linux.zip && \
+    unzip omp-node-linux.zip && \
+    rm omp-node-linux.zip && \
+    mv Server/* . && rmdir Server
 
-EXPOSE 7777/udp
-ENTRYPOINT [ "/entrypoint.sh" ]
+# Step 8: Finalizare imagine pentru server
+WORKDIR /server
+CMD ["./server_executable"]  # Înlocuiește cu numele executabilului serverului
