@@ -1,8 +1,7 @@
-# Dockerfile actualizat
-
 FROM debian:stable-slim AS base
 WORKDIR /server
-RUN dpkg --add-architecture i386 && apt-get clean && apt-get update && apt-get install -y libstdc++6:i386 curl jq wget && apt-get upgrade -y
+RUN dpkg --add-architecture i386 && apt-get clean && apt-get update && apt-get install -y \
+    libstdc++6:i386 curl jq wget unzip && apt-get upgrade -y
 
 # Download OpenMP artifact
 FROM base AS download_openmp
@@ -12,10 +11,10 @@ RUN ARTIFACT_URL=$(curl -s "https://api.github.com/repos/openmultiplayer/open.mp
 | jq -r '.artifacts[]? | select(.name | test("open.mp-linux-x86_64")) | .archive_download_url' || echo "Artifact not found") && \
     echo "OpenMP Artifact URL: $ARTIFACT_URL" && \
     if [ "$ARTIFACT_URL" == "Artifact not found" ]; then echo "Error: Artifact not found. Exiting."; exit 1; fi && \
-    curl -L -o $ARTIFACT_OMP_NAME.tar.gz $ARTIFACT_URL && \
-    ls -lh $ARTIFACT_OMP_NAME.tar.gz && \
-    tar -xzf $ARTIFACT_OMP_NAME.tar.gz && \
-    rm $ARTIFACT_OMP_NAME.tar.gz && \
+    curl -L -o $ARTIFACT_OMP_NAME.zip $ARTIFACT_URL && \
+    ls -lh $ARTIFACT_OMP_NAME.zip && \
+    unzip $ARTIFACT_OMP_NAME.zip && \
+    rm $ARTIFACT_OMP_NAME.zip && \
     mv Server/* . && rmdir Server
 
 # Download OMP Node artifact
@@ -26,10 +25,10 @@ RUN ARTIFACT_URL=$(curl -s "https://api.github.com/repos/AmyrAhmady/omp-node/act
 | jq -r '.artifacts[]? | select(.name | test("omp-node-linux")) | .archive_download_url' || echo "Artifact not found") && \
     echo "OMP Node Artifact URL: $ARTIFACT_URL" && \
     if [ "$ARTIFACT_URL" == "Artifact not found" ]; then echo "Error: Artifact not found. Exiting."; exit 1; fi && \
-    curl -L -o $ARTIFACT_NODE_NAME.tar.gz $ARTIFACT_URL && \
-    ls -lh $ARTIFACT_NODE_NAME.tar.gz && \
-    tar -xzf $ARTIFACT_NODE_NAME.tar.gz && \
-    rm $ARTIFACT_NODE_NAME.tar.gz && \
+    curl -L -o $ARTIFACT_NODE_NAME.zip $ARTIFACT_URL && \
+    ls -lh $ARTIFACT_NODE_NAME.zip && \
+    unzip $ARTIFACT_NODE_NAME.zip && \
+    rm $ARTIFACT_NODE_NAME.zip && \
     mv Server/* . && rmdir Server
 
 # Download CAPI library
