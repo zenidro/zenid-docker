@@ -10,7 +10,12 @@ RUN apt-get clean && apt-get update && \
     libc6 \
     sudo \
     ca-certificates \
+    build-essential \
+    libnode-dev \
+    libstdc++6 \
+    libgcc-s1 \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 
 FROM base AS download_capi
 WORKDIR /server
