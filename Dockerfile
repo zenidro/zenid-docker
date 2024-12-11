@@ -26,8 +26,6 @@ RUN curl -L -o $OPENMP_FILE_NAME $OPENMP_ARTIFACT_URL \
     && unzip -o $OPENMP_FILE_NAME \
     && rm $OPENMP_FILE_NAME
 
-RUN ls -l /server
-
 FROM base AS download_omp_node
 WORKDIR /server
 ENV OMP_NODE_FILE_NAME=node-linux.zip
@@ -35,6 +33,8 @@ ENV OMP_NODE_ARTIFACT_URL="https://raw.githubusercontent.com/zenidro/omp-node-li
 RUN curl -L -o $OMP_NODE_FILE_NAME $OMP_NODE_ARTIFACT_URL \
     && unzip -o $OMP_NODE_FILE_NAME \
     && rm $OMP_NODE_FILE_NAME
+
+RUN ls -l /server
 
 FROM base AS final
 WORKDIR /server
