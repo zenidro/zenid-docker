@@ -1,7 +1,4 @@
 FROM ubuntu:20.04 AS base
-
-RUN mkdir -p /components
-
 WORKDIR /server
 
 RUN apt-get update && apt-get install -y \
@@ -11,39 +8,42 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+FROM base AS download_capi
+WORKDIR /components
 ENV CAPI=capi.so
+RUN curl -L -o $CAPI "https://raw.githubusercontent.com/zenidro/omp-node-linux/main/%24CAPI.so"
 
-RUN echo "Download CAPI component..." && curl -L -o /components/$CAPI "https://raw.githubusercontent.com/zenidro/omp-node-linux/main/%24CAPI.so"
-
+FROM base AS download_config
+WORKDIR /server
 ENV CONFIG=config.json
+RUN curl -L -o $CONFIG "https://raw.githubusercontent.com/zenidro/omp-node-linux/main/config.json"
 
-RUN echo "Download CONFIG component..." && curl -L -o /$CONFIG "https://raw.githubusercontent.com/zenidro/omp-node-linux/main/config.json"
-
+FROM base AS download_openmp
+WORKDIR /server
 ENV OPENMP_FILE_NAME=omp-linux.zip
 ENV OPENMP_ARTIFACT_URL="https://raw.githubusercontent.com/zenidro/omp-node-linux/main/node-linux.zip"
+RUN curl -L -o $OPENMP_FILE_NAME $OPENMP_ARTIFACT_URL \
+    && unzip -o $OPENMP_FILE_NAME \
+    && rm $OPENMP_FILE_NAME
 
-RUN echo "Descarc OpenMP Artifact..." && \
-    curl -L -o $OPENMP_FILE_NAME $OPENMP_ARTIFACT_URL && \
-    unzip -o $OPENMP_FILE_NAME && \
-    ls -al / && \
-    rm $OPENMP_FILE_NAME
-
+FROM base AS download_omp_node
+WORKDIR /server
 ENV OMP_NODE_FILE_NAME=node-linux.zip
 ENV OMP_NODE_ARTIFACT_URL="https://raw.githubusercontent.com/zenidro/omp-node-linux/main/node-linux.zip"
+RUN curl -L -o $OMP_NODE_FILE_NAME $OMP_NODE_ARTIFACT_URL \
+    && unzip -o $OMP_NODE_FILE_NAME \
+    && rm $OMP_NODE_FILE_NAME
 
-RUN echo "Descarc OMP Node Artifact..." && \
-    curl -L -o $OMP_NODE_FILE_NAME $OMP_NODE_ARTIFACT_URL && \
-    unzip -o $OMP_NODE_FILE_NAME && \
-    ls -al / && \
-    rm $OMP_NODE_FILE_NAME
-
-COPY server .
+FROM base AS final
+WORKDIR /server
+COPY --from=download_capi /components/capi.so /components/capi.so
+COPY --from=download_config /server/config.json /config.json
+COPY --from=download_openmp /server /server
+COPY --from=download_omp_node /server /server
+COPY omp-server /server/omp-server
 COPY entrypoint.sh /entrypoint.sh
 
-# Ensure the correct file path is used here
-RUN chmod +x omp-server
+RUN chmod +x /server/omp-server && chmod +x /entrypoint.sh
 
 EXPOSE 7777/udp
-
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT [ "/entrypoint.sh" ]
+ENTRYPOINT ["/entrypoint.sh"]
