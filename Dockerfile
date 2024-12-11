@@ -40,7 +40,6 @@ COPY --from=download_capi /components/capi.so /components/capi.so
 COPY --from=download_config /server/config.json /config.json
 COPY --from=download_openmp /server /server
 COPY --from=download_omp_node /server /server
-COPY omp-server /server/omp-server
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /server/omp-server && chmod +x /entrypoint.sh
