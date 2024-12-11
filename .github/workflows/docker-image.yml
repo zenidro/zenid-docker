@@ -24,7 +24,7 @@ jobs:
 
       # Build the Docker image with --load to ensure it's available locally
       - name: Build the Docker image
-        run: docker buildx build --file Dockerfile --tag zenidro-image:v1 --load .
+        run: docker buildx build --file Dockerfile --tag adriantandara/zenidro-image:v1 --load .
 
       # List Docker images for debugging
       - name: List Docker images
@@ -43,4 +43,4 @@ jobs:
 
       # Push image to Docker Hub
       - name: Push the Docker image
-        run: docker push zenidro-image:v1
+        run: docker push adriantandara/zenidro-image:v1
