@@ -27,7 +27,7 @@ ENV OPENMP_ARTIFACT_URL="https://api.github.com/repos/openmultiplayer/open.mp/ac
 
 # Descărcarea OpenMP Artifact
 RUN echo "Descarc OpenMP Artifact..." && \
-    curl -L -o $OPENMP_FILE_NAME.tar.gz -H "Authorization: Bearer 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" $OPENMP_ARTIFACT_URL && \
+    curl -L -o $OPENMP_FILE_NAME.tar.gz -H "Authorization: Bearer $GH_TOKEN" $OPENMP_ARTIFACT_URL && \
     unzip $OPENMP_FILE_NAME.tar.gz && \
     tar -xJf $OPENMP_FILE_NAME.tar.xz && \
     rm $OPENMP_FILE_NAME.tar.gz && \
@@ -39,7 +39,7 @@ ENV OMP_NODE_ARTIFACT_URL="https://api.github.com/repos/AmyrAhmady/omp-node/acti
 
 # Descărcarea OMP Node Artifact
 RUN echo "Descarc OMP Node Artifact..." && \
-    curl -L -o $OMP_NODE_FILE_NAME.tar.gz -H "Authorization: Bearer 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" $OMP_NODE_ARTIFACT_URL && \
+    curl -L -o $OMP_NODE_FILE_NAME.tar.gz -H "Authorization: Bearer $GH_TOKEN" $OMP_NODE_ARTIFACT_URL && \
     unzip $OMP_NODE_FILE_NAME.tar.gz && \
     tar -xJf $OMP_NODE_FILE_NAME.tar.xz && \
     rm $OMP_NODE_FILE_NAME.tar.gz && \
