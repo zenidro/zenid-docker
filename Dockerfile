@@ -10,8 +10,7 @@ RUN apt-get update && apt-get install -y \
 
 FROM base AS download_capi
 WORKDIR /server
-ENV CAPI=capi.so
-RUN curl -L -o $CAPI "https://raw.githubusercontent.com/zenidro/omp-node-linux/main/%24CAPI.so"
+RUN curl -L -o CAPI.so "https://raw.githubusercontent.com/zenidro/omp-node-linux/main/CAPI.so"
 
 FROM base AS download_config
 WORKDIR /server
@@ -36,7 +35,7 @@ RUN curl -L -o $OMP_NODE_FILE_NAME $OMP_NODE_ARTIFACT_URL \
 
 FROM base AS final
 WORKDIR /server
-COPY --from=download_capi /components/capi.so /components/capi.so
+COPY --from=download_capi /server/CAPI.so /components/CAPI.so
 COPY --from=download_config /server/config.json /config.json
 COPY --from=download_openmp /server /server
 COPY --from=download_omp_node /server /server
