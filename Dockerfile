@@ -16,41 +16,32 @@ RUN apt-get update && apt-get install -y \
 
 # Definirea argumentului GH_TOKEN
 ARG GH_TOKEN
+ENV GH_TOKEN=${GH_TOKEN}
 
-# Definirea variabilei pentru biblioteca CAPI
-ENV CAPI=capi.so
-
-# Descărcarea bibliotecii CAPI
+# Descarcă biblioteca CAPI
 RUN echo "Descărcăm biblioteca CAPI..." && \
-    curl -L -o /components/$CAPI "https://raw.githubusercontent.com/zenidro/capi-fixed/main/%24CAPI.so" && \
+    curl -L -o /components/capi.so "https://raw.githubusercontent.com/zenidro/capi-fixed/main/%24CAPI.so" && \
     ls -l /components
 
-# Setarea variabilelor pentru OpenMP Artifact
-ENV OPENMP_FILE_NAME=open.mp-linux-x86_64-v1.3.1.2744-25-g4cb25eab
-ENV OPENMP_ARTIFACT_URL="https://api.github.com/repos/openmultiplayer/open.mp/actions/artifacts/2179619213/zip"
-
-# Descărcarea OpenMP Artifact
+# Descarcă OpenMP Artifact
 RUN echo "Descarc OpenMP Artifact..." && \
-    curl -L -o $OPENMP_FILE_NAME.tar.gz -H "Authorization: Bearer $GH_TOKEN" $OPENMP_ARTIFACT_URL && \
-    file $OPENMP_FILE_NAME.tar.gz
+    curl -L -o open.mp-linux-x86_64-v1.3.1.2744-25-g4cb25eab.tar.gz -H "Authorization: token ${GH_TOKEN}" https://api.github.com/repos/openmultiplayer/open.mp/actions/artifacts/2179619213/zip && \
+    file open.mp-linux-x86_64-v1.3.1.2744-25-g4cb25eab.tar.gz
 
-# Setarea variabilelor pentru OMP Node Artifact
-ENV OMP_NODE_FILE_NAME=omp-node-linux
-ENV OMP_NODE_ARTIFACT_URL="https://api.github.com/repos/AmyrAhmady/omp-node/actions/artifacts/11895163134/zip"
-
-# Descărcarea OMP Node Artifact
+# Descarcă OMP Node Artifact
 RUN echo "Descarc OMP Node Artifact..." && \
-    curl -L -o $OMP_NODE_FILE_NAME.tar.gz -H "Authorization: Bearer $GH_TOKEN" $OMP_NODE_ARTIFACT_URL && \
-    file $OMP_NODE_FILE_NAME.tar.gz
+    curl -L -o omp-node-linux.tar.gz -H "Authorization: token ${GH_TOKEN}" https://api.github.com/repos/AmyrAhmady/omp-node/actions/artifacts/11895163134/zip && \
+    file omp-node-linux.tar.gz
 
-# Copierea și setarea permisiunilor pentru entrypoint.sh
+# Copiază entrypoint.sh în container
 COPY entrypoint.sh /entrypoint.sh
 
+# Schimbă permisiunile pentru fișierul omp-server
 RUN chmod +x omp-server
 
 # Expunerea portului pentru server
-EXPOSE 7777/udp
+EXPOSE 7777
 
-# Setarea permisiunilor pentru scriptul de entrypoint
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT [ "/entrypoint.sh" ]
+# Setează entrypoint-ul
+ENTRYPOINT ["/entrypoint.sh"]
+
