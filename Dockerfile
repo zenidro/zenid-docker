@@ -6,9 +6,8 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     jq \
     unzip \
     libssl-dev \
-    libffi-dev \
-    libnode-dev \
-    libc6-dev \
+    libc6 \
+    sudo dnf update -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
