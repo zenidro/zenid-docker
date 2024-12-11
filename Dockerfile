@@ -1,7 +1,7 @@
 FROM ubuntu:20.04 AS base
 WORKDIR /server
 
-RUN apt-get-clean && apt-get update && apt-get install -y \
+RUN apt-get clean && apt-get update && apt-get install -y \
     curl \
     jq \
     unzip \
@@ -10,7 +10,7 @@ RUN apt-get-clean && apt-get update && apt-get install -y \
     libnode-dev \
     libc6-dev \
     ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 FROM base AS download_capi
 WORKDIR /server
