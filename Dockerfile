@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     jq \
     unzip \
     ca-certificates \
+    file \
     && rm -rf /var/lib/apt/lists/*
 
 # Definirea argumentului GH_TOKEN
