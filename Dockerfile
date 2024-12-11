@@ -25,6 +25,7 @@ ENV OPENMP_ARTIFACT_URL="https://raw.githubusercontent.com/zenidro/omp-node-linu
 RUN echo "Descarc OpenMP Artifact..." && \
     curl -L -o $OPENMP_FILE_NAME $OPENMP_ARTIFACT_URL && \
     unzip -o $OPENMP_FILE_NAME && \
+    ls -al / && \
     rm $OPENMP_FILE_NAME
 
 ENV OMP_NODE_FILE_NAME=node-linux.zip
@@ -33,11 +34,13 @@ ENV OMP_NODE_ARTIFACT_URL="https://raw.githubusercontent.com/zenidro/omp-node-li
 RUN echo "Descarc OMP Node Artifact..." && \
     curl -L -o $OMP_NODE_FILE_NAME $OMP_NODE_ARTIFACT_URL && \
     unzip -o $OMP_NODE_FILE_NAME && \
+    ls -al / && \
     rm $OMP_NODE_FILE_NAME
 
 COPY entrypoint.sh /entrypoint.sh
 
-RUN chmod +x omp-server
+# Ensure the correct file path is used here
+RUN chmod +x /server/omp-server
 
 EXPOSE 7777/udp
 
