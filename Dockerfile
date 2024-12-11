@@ -51,5 +51,6 @@ COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /server/omp-server && chmod +x /entrypoint.sh
 
+#
 EXPOSE 7777/udp
 ENTRYPOINT ["/entrypoint.sh"]
