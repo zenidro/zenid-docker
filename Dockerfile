@@ -10,7 +10,7 @@ RUN dpkg --add-architecture i386 && apt-get clean && apt-get update && \
     libc6 \
     sudo \
     ca-certificates \
-    libnode-dev:amd64 libnode-dev:i386 \
+    libnode-dev:amd64 \
     libstdc++6:amd64 libstdc++6:i386 \
     libgcc-s1:amd64 libgcc-s1:i386 \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
