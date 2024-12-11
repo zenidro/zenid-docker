@@ -11,37 +11,48 @@ RUN apt-get update && apt-get install -y \
     jq \
     unzip \
     ca-certificates \
-    file \
     && rm -rf /var/lib/apt/lists/*
 
-# Definirea argumentului GH_TOKEN
-ARG GH_TOKEN
-ENV GH_TOKEN=${GH_TOKEN}
+# Definirea variabilei pentru biblioteca CAPI
+ENV CAPI=capi.so
 
-# Descarcă biblioteca CAPI
+# Descărcarea bibliotecii CAPI
 RUN echo "Descărcăm biblioteca CAPI..." && \
-    curl -L -o /components/capi.so "https://raw.githubusercontent.com/zenidro/capi-fixed/main/%24CAPI.so" && \
+    curl -L -o /components/$CAPI "https://raw.githubusercontent.com/zenidro/capi-fixed/main/%24CAPI.so" && \
     ls -l /components
 
-# Descarcă OpenMP Artifact
+# Setarea variabilelor pentru OpenMP Artifact
+ENV OPENMP_FILE_NAME=open.mp-linux-x86_64-v1.3.1.2744-25-g4cb25eab
+ENV OPENMP_ARTIFACT_URL="https://api.github.com/repos/openmultiplayer/open.mp/actions/artifacts/2179619213/zip"
+
+# Descărcarea OpenMP Artifact
 RUN echo "Descarc OpenMP Artifact..." && \
-    curl -L -o open.mp-linux-x86_64-v1.3.1.2744-25-g4cb25eab.tar.gz -H "Authorization: token ${GH_TOKEN}" https://api.github.com/repos/openmultiplayer/open.mp/actions/artifacts/2179619213/zip && \
-    file open.mp-linux-x86_64-v1.3.1.2744-25-g4cb25eab.tar.gz
+    curl -L -o $OPENMP_FILE_NAME.tar.gz -H "Authorization: Bearer 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" $OPENMP_ARTIFACT_URL && \
+    unzip $OPENMP_FILE_NAME.tar.gz && \
+    tar -xJf $OPENMP_FILE_NAME.tar.xz && \
+    rm $OPENMP_FILE_NAME.tar.gz && \
+    mv Server/* . && rmdir Server
 
-# Descarcă OMP Node Artifact
+# Setarea variabilelor pentru OMP Node Artifact
+ENV OMP_NODE_FILE_NAME=omp-node-linux
+ENV OMP_NODE_ARTIFACT_URL="https://api.github.com/repos/AmyrAhmady/omp-node/actions/artifacts/11895163134/zip"
+
+# Descărcarea OMP Node Artifact
 RUN echo "Descarc OMP Node Artifact..." && \
-    curl -L -o omp-node-linux.tar.gz -H "Authorization: token ${GH_TOKEN}" https://api.github.com/repos/AmyrAhmady/omp-node/actions/artifacts/11895163134/zip && \
-    file omp-node-linux.tar.gz
+    curl -L -o $OMP_NODE_FILE_NAME.tar.gz -H "Authorization: Bearer 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" $OMP_NODE_ARTIFACT_URL && \
+    unzip $OMP_NODE_FILE_NAME.tar.gz && \
+    tar -xJf $OMP_NODE_FILE_NAME.tar.xz && \
+    rm $OMP_NODE_FILE_NAME.tar.gz && \
+    mv Server/* . && rmdir Server
 
-# Copiază entrypoint.sh în container
+# Copierea și setarea permisiunilor pentru entrypoint.sh
 COPY entrypoint.sh /entrypoint.sh
 
-# Schimbă permisiunile pentru fișierul omp-server
 RUN chmod +x omp-server
 
 # Expunerea portului pentru server
-EXPOSE 7777
+EXPOSE 7777/udp
 
-# Setează entrypoint-ul
-ENTRYPOINT ["/entrypoint.sh"]
-
+# Setarea permisiunilor pentru scriptul de entrypoint
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT [ "/entrypoint.sh" ]
