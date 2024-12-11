@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 AS base
+FROM ubuntu:22.04 AS base
 WORKDIR /server
 
 RUN apt-get clean && apt-get update && apt-get install -y \
