@@ -7,7 +7,7 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     unzip \
     libssl-dev \
     libc6 \
-    sudo dnf update -y \
+    sudo \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
