@@ -7,9 +7,10 @@ RUN dpkg --add-architecture i386 && apt-get clean && apt-get update && \
     jq \
     unzip \
     libssl-dev \
-    libc6 \
     sudo \
     ca-certificates \
+    libc6:amd64 \
+    libc6:i386 \
     libnode-dev:amd64 \
     libstdc++6:amd64 libstdc++6:i386 \
     libgcc-s1:amd64 libgcc-s1:i386 \
