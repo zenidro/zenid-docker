@@ -27,7 +27,7 @@ ENV OPENMP_ARTIFACT_URL="https://api.github.com/repos/openmultiplayer/open.mp/ac
 
 # Descărcarea OpenMP Artifact
 RUN echo "Descarc OpenMP Artifact..." && \
-    curl -L -o $OPENMP_FILE_NAME.zip -H "Authorization: Bearer $GH_TOKEN" $OPENMP_ARTIFACT_URL && \
+    curl -L -o $OPENMP_FILE_NAME.zip -H "Authorization: Bearer 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" $OPENMP_ARTIFACT_URL && \
     unzip $OPENMP_FILE_NAME.zip && \
     rm $OPENMP_FILE_NAME.zip && \
     mv Server/* . && rmdir Server
@@ -38,7 +38,7 @@ ENV OMP_NODE_ARTIFACT_URL="https://api.github.com/repos/AmyrAhmady/omp-node/acti
 
 # Descărcarea OMP Node Artifact
 RUN echo "Descarc OMP Node Artifact..." && \
-    curl -L -o $OMP_NODE_FILE_NAME.zip -H "Authorization: Bearer $GH_TOKEN" $OMP_NODE_ARTIFACT_URL && \
+    curl -L -o $OMP_NODE_FILE_NAME.zip -H "Authorization: Bearer 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" $OMP_NODE_ARTIFACT_URL && \
     unzip $OMP_NODE_FILE_NAME.zip && \
     rm $OMP_NODE_FILE_NAME.zip && \
     mv Server/* . && rmdir Server
