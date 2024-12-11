@@ -11,13 +11,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the code from the repository
       - uses: actions/checkout@v4
 
+      # Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      # Check Buildx version for debugging
+      - name: Check Buildx version
+        run: docker buildx version
+
+      # Build the Docker image with --load to ensure it's available locally
       - name: Build the Docker image
-        run: docker buildx build --file Dockerfile --tag zenidro-image:v1 --progress=plain .
+        run: docker buildx build --file Dockerfile --tag zenidro-image:v1 --load .
 
       # List Docker images for debugging
       - name: List Docker images
