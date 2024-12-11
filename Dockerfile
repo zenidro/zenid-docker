@@ -1,7 +1,7 @@
 FROM ubuntu:24.04 AS base
 WORKDIR /server
 
-RUN apt-get clean && apt-get update && \
+RUN dpkg --add-architecture i386 && apt-get clean && apt-get update && \
     apt-get install -y \
     curl \
     jq \
@@ -10,12 +10,10 @@ RUN apt-get clean && apt-get update && \
     libc6 \
     sudo \
     ca-certificates \
-    build-essential \
-    libnode-dev \
-    libstdc++6 \
-    libgcc-s1 \
+    libnode-dev:amd64 libnode-dev:i386 \
+    libstdc++6:amd64 libstdc++6:i386 \
+    libgcc-s1:amd64 libgcc-s1:i386 \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
 
 FROM base AS download_capi
 WORKDIR /server
