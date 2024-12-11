@@ -1,11 +1,9 @@
 FROM ubuntu:20.04 AS base
 
-# Crearea directorului de componente
 RUN mkdir -p /components
 
 WORKDIR /server
 
-# Instalarea pachetelor necesare
 RUN apt-get update && apt-get install -y \
     curl \
     jq \
@@ -13,44 +11,36 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Definirea variabilei pentru biblioteca CAPI
 ENV CAPI=capi.so
 
-# Descărcarea bibliotecii CAPI
-RUN echo "Descărcăm biblioteca CAPI..." && \
-    curl -L -o /components/$CAPI "https://raw.githubusercontent.com/zenidro/capi-fixed/main/%24CAPI.so" && \
-    ls -l /components
+RUN echo "Download CAPI component..." && curl -L -o /components/$CAPI "https://raw.githubusercontent.com/zenidro/omp-node-linux/main/%24CAPI.so"
 
-# Setarea variabilelor pentru OpenMP Artifact
-ENV OPENMP_FILE_NAME=open.mp-linux-x86_64-v1.3.1.2744-25-g4cb25eab
-ENV OPENMP_ARTIFACT_URL="https://api.github.com/repos/openmultiplayer/open.mp/actions/artifacts/2179619213/zip"
+ENV CONFIG=config.json
 
-# Descărcarea OpenMP Artifact
+RUN echo "Download CONFIG component..." && curl -L -o /$CONFIG "https://raw.githubusercontent.com/zenidro/omp-node-linux/main/config.json"
+
+ENV OPENMP_FILE_NAME=omp-linux.zip
+ENV OPENMP_ARTIFACT_URL="https://raw.githubusercontent.com/zenidro/omp-node-linux/main/node-linux.zip"
+
 RUN echo "Descarc OpenMP Artifact..." && \
-    curl -L -o $OPENMP_FILE_NAME.zip -H "Authorization: Bearer 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" $OPENMP_ARTIFACT_URL && \
-    unzip $OPENMP_FILE_NAME.zip && \
-    rm $OPENMP_FILE_NAME.zip && \
+    curl -L -o $OPENMP_FILE_NAME -H $OPENMP_ARTIFACT_URL && \
+    unzip $OPENMP_FILE_NAME && \
+    rm $OPENMP_FILE_NAME && \
     mv Server/* . && rmdir Server
 
-# Setarea variabilelor pentru OMP Node Artifact
-ENV OMP_NODE_FILE_NAME=omp-node-linux
-ENV OMP_NODE_ARTIFACT_URL="https://api.github.com/repos/AmyrAhmady/omp-node/actions/artifacts/11895163134/zip"
+ENV OMP_NODE_FILE_NAME=node-linux.zip
+ENV OMP_NODE_ARTIFACT_URL="https://raw.githubusercontent.com/zenidro/omp-node-linux/main/node-linux.zip"
 
-# Descărcarea OMP Node Artifact
 RUN echo "Descarc OMP Node Artifact..." && \
-    curl -L -o $OMP_NODE_FILE_NAME.zip -H "Authorization: Bearer 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" $OMP_NODE_ARTIFACT_URL && \
-    unzip $OMP_NODE_FILE_NAME.zip && \
-    rm $OMP_NODE_FILE_NAME.zip && \
-    mv Server/* . && rmdir Server
+    curl -L -o $OMP_NODE_FILE_NAME -H $OMP_NODE_ARTIFACT_URL && \
+    unzip $OMP_NODE_FILE_NAME && \
+    rm $OMP_NODE_FILE_NAME
 
-# Copierea și setarea permisiunilor pentru entrypoint.sh
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x omp-server
 
-# Expunerea portului pentru server
 EXPOSE 7777/udp
 
-# Setarea permisiunilor pentru scriptul de entrypoint
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
