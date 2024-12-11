@@ -17,6 +17,4 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Build the Docker image
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: docker buildx build --file Dockerfile --tag zenidro-image:$(date +%s) .

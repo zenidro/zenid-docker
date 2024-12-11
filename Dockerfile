@@ -26,6 +26,8 @@ RUN curl -L -o $OPENMP_FILE_NAME $OPENMP_ARTIFACT_URL \
     && unzip -o $OPENMP_FILE_NAME \
     && rm $OPENMP_FILE_NAME
 
+RUN ls -l /server
+
 FROM base AS download_omp_node
 WORKDIR /server
 ENV OMP_NODE_FILE_NAME=node-linux.zip
@@ -40,7 +42,7 @@ COPY --from=download_capi /components/capi.so /components/capi.so
 COPY --from=download_config /server/config.json /config.json
 COPY --from=download_openmp /server /server
 COPY --from=download_omp_node /server /server
-COPY omp-server /server/omp-server
+COPY --from=download_openmp /server/omp-server /server/omp-server
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /server/omp-server && chmod +x /entrypoint.sh
