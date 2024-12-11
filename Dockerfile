@@ -25,8 +25,7 @@ ENV OPENMP_ARTIFACT_URL="https://raw.githubusercontent.com/zenidro/omp-node-linu
 RUN echo "Descarc OpenMP Artifact..." && \
     curl -L -o $OPENMP_FILE_NAME $OPENMP_ARTIFACT_URL && \
     unzip $OPENMP_FILE_NAME && \
-    rm $OPENMP_FILE_NAME && \
-    mv Server/* . && rmdir Server
+    rm $OPENMP_FILE_NAME
 
 ENV OMP_NODE_FILE_NAME=node-linux.zip
 ENV OMP_NODE_ARTIFACT_URL="https://raw.githubusercontent.com/zenidro/omp-node-linux/main/node-linux.zip"
