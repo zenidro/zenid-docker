@@ -37,7 +37,7 @@ RUN echo "Descarc OMP Node Artifact..." && \
     ls -al / && \
     rm $OMP_NODE_FILE_NAME
 
-COPY server/ /server/
+COPY server .
 COPY entrypoint.sh /entrypoint.sh
 
 # Ensure the correct file path is used here
