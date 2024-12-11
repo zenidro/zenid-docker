@@ -44,7 +44,6 @@ COPY --from=download_openmp /server/ .
 COPY --from=download_omp_node /server/ .
 COPY entrypoint.sh /entrypoint.sh
 
-#
 RUN chmod +x /server/omp-server && chmod +x /entrypoint.sh
 
 EXPOSE 7777/udp
