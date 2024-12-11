@@ -18,5 +18,6 @@ jobs:
 
       - name: Build the Docker image
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: docker buildx build --file Dockerfile --tag zenidro-image:$(date +%s) .
+          GH_TOKEN: ${{ secrets.GH_TOKEN }} # transmite GH_TOKEN din secrete
+        run: |
+          docker buildx build --file Dockerfile --tag zenidro-image:$(date +%s) --build-arg GH_TOKEN=${{ secrets.GH_TOKEN }} .
