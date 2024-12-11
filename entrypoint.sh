@@ -1,3 +1,4 @@
+#!/bin/bash
 cd /server
 
 OMP_CLI_ARGS=()
